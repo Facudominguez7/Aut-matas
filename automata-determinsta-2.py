@@ -13,48 +13,37 @@ class Automata:
     def graficar(self, aceptado):
         dot = graphviz.Digraph()
 
-        # Agregar estados
         for estado in self.estados:
             if estado in self.estados_aceptacion:
                 dot.node(estado, shape='doublecircle')
             else:
                 dot.node(estado)
 
-        # Agregar transiciones
         for estado, transicion in self.transiciones.items():
             for simbolo, destino in transicion.items():
                 dot.edge(estado, destino, label=simbolo)
 
-        # Guardar el gráfico temporalmente
         dot.render('afd', format='png', cleanup=False)
         
-        # Abrir la imagen del autómata
         img = Image.open('afd.png')
         
-        # Cargar la imagen de la palomita de aprobación o la X roja
         if aceptado:
             simbolo_img = Image.open("acepta.png")
         else:
             simbolo_img = Image.open("rechaza.png")
             
-        # Convertir la imagen a modo RGBA para admitir transparencia
         simbolo_img = simbolo_img.convert("RGBA")
         
-        # Ajustar la transparencia de la imagen
-        alpha = 128  # 0 (transparente) a 255 (opaco)
+        alpha = 128 
         simbolo_img.putalpha(alpha)
 
-        # Escalar el símbolo para que quepa en la imagen del autómata
         width, height = img.size
         simbolo_img.thumbnail((width // 4, height // 4))
 
-        # Posicionar el símbolo en la esquina superior derecha
         img.paste(simbolo_img, (width - simbolo_img.width - 10, 10), simbolo_img)
-        
-        # Mostrar la imagen
+
         img.show()
 
-        # Eliminar el archivo del autómata después de mostrar la imagen
         os.remove('afd.png')
 
     def acepta_cadena(self, cadena):
@@ -71,7 +60,6 @@ class Automata:
         return estado_actual in self.estados_aceptacion
 
 
-# Ejemplo de uso
 estados = {'q0', 'q1', 'q2'}
 alfabeto = {'0', '1'}
 transiciones = {'q0': {'0': 'q1', '1': 'q2'},
@@ -84,7 +72,6 @@ afd = Automata(estados, alfabeto, transiciones, estado_inicial, estados_aceptaci
 
 cadena = input("Ingrese una cadena para verificar si el autómata la acepta o no: ")
 
-# Verifica si la cadena contiene solo símbolos del alfabeto
 if all(simbolo in alfabeto for simbolo in cadena):
     aceptado = afd.acepta_cadena(cadena)
     afd.graficar(aceptado)

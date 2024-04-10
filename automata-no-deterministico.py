@@ -22,49 +22,38 @@ class AutomataND:
     def graficar(self, aceptado):
         dot = graphviz.Digraph()
 
-        # Agregar estados al gráfico
         for estado in self.estados:
             if estado in self.estados_aceptacion:
-                dot.node(estado, shape='doublecircle')  # Estado de aceptación
+                dot.node(estado, shape='doublecircle')
             else:
                 dot.node(estado)
 
-        # Agregar transiciones al gráfico
         for estado, transicion in self.transiciones.items():
             for simbolo, destinos in transicion.items():
                 for destino in destinos:
                     dot.edge(estado, destino, label=simbolo)
 
-        # Guardar el gráfico temporalmente
         dot.render('afnd', format='png', cleanup=False)
         
-        # Abrir la imagen del autómata
         img = Image.open('afnd.png')
         
-        # Cargar la imagen de la palomita de aprobación o la X roja
         if aceptado:
             simbolo_img = Image.open("acepta.png")
         else:
             simbolo_img = Image.open("rechaza.png")
         
-        # Convertir la imagen a modo RGBA para admitir transparencia
         simbolo_img = simbolo_img.convert("RGBA")
         
-        # Ajustar la transparencia de la imagen
-        alpha = 128  # 0 (transparente) a 255 (opaco)
+        alpha = 128
         simbolo_img.putalpha(alpha)
 
-        # Escalar el símbolo para que quepa en la imagen del autómata
         width, height = img.size
         simbolo_img.thumbnail((width // 4, height // 4))
 
-        # Posicionar el símbolo en la esquina superior derecha
         img.paste(simbolo_img, (width - simbolo_img.width - 10, 10), simbolo_img)
         
-        # Mostrar la imagen
         img.show()
 
-        # Eliminar el archivo del autómata después de mostrar la imagen
         os.remove('afnd.png')
 
     def acepta_cadena(self, cadena):
